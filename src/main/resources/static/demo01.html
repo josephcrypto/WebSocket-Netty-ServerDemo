@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>webSocket demo</title>
+</head>
+<body>
+Welcome<br/><input id="text" type="text"/>
+<button onclick="send()">Send Message</button>
+<hr/>
+<button onclick="closeWebSocket()">Close the WebSocket connection</button>
+<hr/>
+<div id="message"></div>
+</body>
+<script type="text/javascript">
+    var websocket = null;
+
+    // Determine whether the current browser supports WebSocket
+    if ('WebSocket' in window) {
+        console.log('The Current browser supports webSocket');
+        websocket = new WebSocket("ws://localhost:20002/myWebSocket/1");
+    } else {
+        console.log('The current browser does not support webSocket')
+    }
+    // Callback method for connection error
+    websocket.onerror = function () {
+        console.log("An error occurred in the WebSocket connection");
+    };
+
+    // Callback method for successful connection establishment
+    websocket.onopen = function () {
+        console.log("WebSocket connection is successful");
+    };
+    // The callback method of receiving the message
+    websocket.onmessage = function (event) {
+        console.log(event.data);
+    };
+
+    // Callback method for connection closed
+    websocket.onclose = function () {
+        console.log("WebSocket connection closed");
+    };
+    // Listen to the window close event, when the window is closed, actively close the websocket connection to prevent
+    // the window from being closed before the connection is disconnected, and the server will throw an exception.
+    window.onbeforeunload = function () {
+        closeWebSocket();
+    };
+
+    // Display the message on the web page
+    function setMessageInnerHTML(innerHTML) {
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+    }
+    // Close the WebSocket connection
+    function closeWebSocket() {
+        websocket.close();
+    }
+    //Send a message
+    function send() {
+        var message = document.getElementById('text').value;
+        websocket.send(message);
+    }
+</script>
+</html>
